@@ -3,6 +3,7 @@ import argparse
 import subprocess
 import os
 
+
 def get_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("input")    
@@ -18,7 +19,7 @@ def get_args():
 
 
 def main():
-    with open("./auth_key.txt") as f:
+    with open(os.path.join(os.path.dirname(__file__),"auth_key.txt")) as f:
         auth_key = f.read()
     
     translator = deepl.Translator(auth_key)
@@ -27,7 +28,7 @@ def main():
     try:
         with open(args.input, "rb") as in_file, open(args.output, "wb") as out_file:
             translator.translate_document(in_file, out_file, target_lang=args.language, formality="more")
-        subprocess.run(f"open \"{args.output}\"")
+        subprocess.run(["open", args.output])
             
     except deepl.DocumentTranslationException as error:
         doc_id = error.document_handle.id
@@ -36,6 +37,9 @@ def main():
         
     except deepl.DeepLException as error:
         print(error)
+    
+    else:
+        subprocess.run(f"open \"{args.output}\"")
 
 
 if __name__ == "__main__":
